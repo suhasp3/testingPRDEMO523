@@ -2,12 +2,15 @@ import { useState } from 'react'
 import TodoItem from './components/TodoItem'
 import './App.css'
 
+const FILTERS = ['All', 'Active', 'Completed']
+
 export default function App() {
   const [todos, setTodos] = useState([
     { id: 1, text: 'Buy groceries', completed: false },
     { id: 2, text: 'Walk the dog', completed: true },
   ])
   const [input, setInput] = useState('')
+  const [filter, setFilter] = useState('All')
 
   function addTodo() {
     const trimmed = input.trim()
@@ -28,6 +31,12 @@ export default function App() {
     if (e.key === 'Enter') addTodo()
   }
 
+  const visibleTodos = todos.filter(t => {
+    if (filter === 'Active') return !t.completed
+    if (filter === 'Completed') return t.completed
+    return true
+  })
+
   return (
     <div className="container">
       <h1>Todo List</h1>
@@ -43,8 +52,20 @@ export default function App() {
         <button onClick={addTodo}>Add</button>
       </div>
 
+      <div className="filter-bar">
+        {FILTERS.map(f => (
+          <button
+            key={f}
+            className={`filter-btn ${filter === f ? 'active' : ''}`}
+            onClick={() => setFilter(f)}
+          >
+            {f}
+          </button>
+        ))}
+      </div>
+
       <ul className="todo-list">
-        {todos.map(todo => (
+        {visibleTodos.map(todo => (
           <TodoItem
             key={todo.id}
             todo={todo}
@@ -54,8 +75,8 @@ export default function App() {
         ))}
       </ul>
 
-      {todos.length === 0 && (
-        <p className="empty">No tasks yet. Add one above!</p>
+      {visibleTodos.length === 0 && (
+        <p className="empty">No tasks here.</p>
       )}
     </div>
   )
